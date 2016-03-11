@@ -11,7 +11,7 @@ namespace ParallelHelper.Tests
         public void LoadData_Calls_Data()
         {
             var testHelper = new ReadDataHelper();
-            var processor = new ParallelProcessor<string,string>();
+            var processor = new ParallelProcessor<string>();
 
             processor.LoadData = testHelper.GetStrings;
 
