@@ -3,24 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Diagnostics;
 namespace ParallelHelper
 {
-    public class ParallelProcessor<T>
+    public class ParallelProcessor<T> where T : class, new()
     {
+        private Stopwatch _watch;
+
         public ParallelProcessor()
         {
             List1 = new List<T>();
             List2 = new List<T>();
+            _watch = new Stopwatch();
         }
         public List<T> List1 { get; private set; }
         public List<T> List2 { get; private set; }
+        public long SequentialLastMilliseconds { get; private set; }
+        public long ParallelLastMilliseconds { get; private set; }
 
         public Func<List<T>> LoadData;
         public Action<List<T>> ProcessData;
 
         public void Start()
         {
+            _watch.Restart();
+            ParallelLastMilliseconds = 0;
             var readList = 1;
             var done = true;           
             while (!done)
@@ -51,11 +58,32 @@ namespace ParallelHelper
 
                 Task.WaitAll(loadTask, processTask);
                 readList = (readList == 1) ? 2 : 1;
-            }        
+            }
+            _watch.Stop();
+            ParallelLastMilliseconds = _watch.ElapsedMilliseconds;
+            Debug.WriteLine("Parallel processing took:{0} ms", ParallelLastMilliseconds);
         }
-    }
 
-    public class SequentialProcessor<TObjectToPocess, TProcessedObject>
-    {
+        public void StartSequential()
+        {
+            _watch.Restart();
+            SequentialLastMilliseconds = 0;
+            var done = false;
+            while (!done)
+            {
+                var objectsToProcess = LoadData.Invoke();
+                if(objectsToProcess.Count() == 0)
+                {
+                    done = true;
+                }
+                else
+                {
+                    ProcessData(objectsToProcess);
+                }
+            }
+            _watch.Stop();
+            SequentialLastMilliseconds = _watch.ElapsedMilliseconds;
+            Debug.WriteLine("Sequential processing took:{0} ms", SequentialLastMilliseconds);
+        }
     }
 }
