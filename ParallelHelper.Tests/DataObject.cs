@@ -9,10 +9,10 @@ namespace ParallelHelper.Tests
 {
     public class DataObject
     {
-        public int Data { get; set; }
+        public string Data { get; set; }
         public DataObject()
         {
-            Data = new Random().Next();
+            Data = new Random().Next().ToString();
         }
     }
 }

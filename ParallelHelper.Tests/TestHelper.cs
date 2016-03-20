@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -36,8 +37,10 @@ namespace ParallelHelper.Tests
             return data;
         }
 
-        public void ProcessData(List<DataObject> objects)
+        public void ProcessData(DataObject obj)
         {
+            Thread.Sleep(20);
+            obj.Data += string.Format(": {0}", DateTime.Now);
         }
     }
 }
