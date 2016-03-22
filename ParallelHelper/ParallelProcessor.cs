@@ -7,28 +7,55 @@ using System.Threading.Tasks;
 
 namespace ParallelHelper
 {
+    /// <summary>
+    /// Manages processing of data using the TPL to optimize performance.
+    /// </summary>
+    /// <typeparam name="T">The type of object to be processed.</typeparam>
     public class ParallelProcessor<T> where T : class, new()
     {
         private Stopwatch _watch;
 
+        private List<T> _list1;
+        private List<T> _list2;
+
         public ParallelProcessor()
         {
-            List1 = new List<T>();
-            List2 = new List<T>();
+            _list1 = new List<T>();
+            _list2 = new List<T>();
             _watch = new Stopwatch();
         }
 
-        public List<T> List1 { get; private set; }
-        public List<T> List2 { get; private set; }
-
+        /// <summary>
+        /// The time elapsed for the last run of the StartSequential control method.
+        /// </summary>
         public long SequentialLastMilliseconds { get; private set; }
+        /// <summary>
+        /// The time elapsed for the last run of the Start() method.
+        /// </summary>
         public long ParallelLastMilliseconds { get; private set; }
+        /// <summary>
+        /// Number of objects processed by the last run of the Start() method.
+        /// </summary>
         public long ParallelNumObjectsLastProcessed { get; private set; }
+        /// <summary>
+        /// Number fo objects processed by the last run of the StartSequential() conrol method.
+        /// </summary>
         public long SequentialNumObjectsProcessed { get; private set; }
 
+        /// <summary>
+        /// Delegate function which will return a list of data objects of type T to process.
+        /// </summary>
         public Func<List<T>> LoadData;
+        /// <summary>
+        ///  Delegate routine that should will individually process each object of type T retunred in a list from the LoadData delegate.
+        /// </summary>
         public Action<T> ProcessData;
 
+        /// <summary>
+        /// Processes data on two threads by calling LoadData until LoadData returns ether null or an empty list.
+        /// Every time LoadData completes and returns a list of data, ProcessData is invoked on each object in the
+        /// list in a Parallel loop, while LoadData is simulaneously called again to load more data.
+        /// </summary>
         public void Start()
         {
             _watch.Restart();
@@ -42,13 +69,13 @@ namespace ParallelHelper
                 {
                     if (readList == 1)
                     {
-                        List1 = LoadData.Invoke();
-                        if (List1.Count == 0) done = true;
+                        _list1 = LoadData.Invoke();
+                        if (_list1 == null || _list1.Count == 0) done = true;
                     }
                     else
                     {
-                        List2 = LoadData.Invoke();
-                        if (List2.Count == 0) done = true;
+                        _list2 = LoadData.Invoke();
+                        if (_list2 == null || _list2.Count == 0) done = true;
                     }
                 });
 
@@ -57,11 +84,11 @@ namespace ParallelHelper
                     List<T> ListToProcess = null;
                     if (readList == 1)
                     {
-                        ListToProcess = List2;
+                        ListToProcess = _list2;
                     }
                     else
                     {
-                        ListToProcess = List1;
+                        ListToProcess = _list1;
                     }
                     Parallel.ForEach(ListToProcess, (obj) =>
                     {
@@ -79,6 +106,10 @@ namespace ParallelHelper
             Debug.WriteLine("Parallel processing took:{0} ms", ParallelLastMilliseconds);
         }
 
+        /// <summary>
+        /// This is a control method that processes data in a standard sequential fashion and
+        /// can be used to benchmark against the Start() which ustilizes the TPL.
+        /// </summary>
         public void StartSequential()
         {
             _watch.Restart();
@@ -88,7 +119,7 @@ namespace ParallelHelper
             while (!done)
             {
                 var objectsToProcess = LoadData.Invoke();
-                if (objectsToProcess.Count() == 0)
+                if (objectsToProcess == null || objectsToProcess.Count() == 0)
                 {
                     done = true;
                 }
@@ -96,7 +127,7 @@ namespace ParallelHelper
                 {
                     foreach (var obj in objectsToProcess)
                     {
-                        ProcessData(obj);
+                        ProcessData.Invoke(obj);
                         SequentialNumObjectsProcessed++;
                     }
                 }

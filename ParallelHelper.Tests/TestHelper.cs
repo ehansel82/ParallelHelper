@@ -12,11 +12,11 @@ namespace ParallelHelper.Tests
         private int _take;
         private int _totalRecs;
 
-        public TestHelper()
+        public TestHelper(int totalRecs)
         {
             _take = 3;
             _skip = 0;
-            _totalRecs = 12;
+            _totalRecs = totalRecs;
             InitializeData();
         }
 
