@@ -17,7 +17,7 @@ ParallelProcessor takes these improvements a step further.  The concept is that 
 of data, while another thread is simultaneously reading in a new chunk that will be processed next. A switching mechanism is utilized so that two threads are costantly "busy" with one thread reading and one thread pocessing to maximize throughput.
 
 ### Setup:
-The unit test project can be reviewed to show an example of setup; however the basics are as follows.
+The unit test project can be reviewed to show an example of setup; however, the basics are as follows.
 + Create a new instance of ParallelProcessor.
 + Assign a function that returns a List of the objects you wish to process to the LoadData delegate.
 + Assign a routine that processes an individual object to the ProcessData delegate.
