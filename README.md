@@ -14,5 +14,5 @@ The memory could be managed by reading and processing "chunks" of data at a time
 The processing of each chunk could then be run in a Parallel loop to then increase throughput.
 
 ParallelProcessor takes these improvements a step further.  The concept is that one thread is utilized to process a chunk
-of data, while another thread is reading in a new chunk to proces next. A switching mechanism is utilize so that two threads
+of data, while another thread is reading in a new chunk to process next. A switching mechanism is utilized so that two threads
 are costantly "busy" with one thread reading and one thread pocessing to maximize throughput.
