@@ -9,6 +9,8 @@ namespace ParallelHelper
 {
     /// <summary>
     /// Manages processing of data using the TPL to optimize performance.
+    /// Use cases are processing large amounts of data with a low memory
+    /// footprint by
     /// </summary>
     /// <typeparam name="T">The type of object to be processed.</typeparam>
     public class ParallelProcessor<T> where T : class, new()
@@ -47,7 +49,7 @@ namespace ParallelHelper
         /// </summary>
         public Func<List<T>> LoadData;
         /// <summary>
-        ///  Delegate routine that should will individually process each object of type T retunred in a list from the LoadData delegate.
+        ///  Delegate routine that will individually process each object of type T returned from the LoadData delegate.
         /// </summary>
         public Action<T> ProcessData;
 
